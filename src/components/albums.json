@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "name": "Album 1",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    },
+    {
+        "id": 2,
+        "name": "Album 2",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    },
+    {
+        "id": 3,
+        "name": "Album 3",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    },
+    {
+        "id": 1,
+        "name": "Album 1",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    },
+    {
+        "id": 2,
+        "name": "Album 2",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    },
+    {
+        "id": 3,
+        "name": "Album 3",
+        "cover_url": "https://www.dropbox.com/s/fwqo7hzo8g6b5ai/cover.jpg?raw=1"
+    }
+]
