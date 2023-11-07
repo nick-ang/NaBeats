@@ -8,7 +8,6 @@ import Player from "./components/Player";
 import Song from "./components/Song";
 import Library from "./components/Library";
 import Nav from "./components/Nav";
-import Credit from "./components/Credit";
 import AlbumList from "./components/AlbumList";
 // Import data
 import data from "./data";
