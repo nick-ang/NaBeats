@@ -12,3 +12,4 @@ Add socials
 Add sample packs
 Embed soundcloud
 Add to linkedin, website and socials
+Add Play counter
