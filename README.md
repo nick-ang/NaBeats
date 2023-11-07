@@ -1,7 +1,13 @@
 # A clean, minimalistic react music player web application.
 
+To Run
 ```
-npm start
+yarn run start
+```
+
+To Deploy
+```
+fly deploy
 ```
 
 TODO:
