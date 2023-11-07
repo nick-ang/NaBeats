@@ -1,13 +1,15 @@
 # A clean, minimalistic react music player web application.
 
+https://nabeats.netlify.app/
+
 To Run
 ```
-yarn run start
+npm run start
 ```
 
 To Deploy
 ```
-fly deploy
+deploy via netlify
 ```
 
 TODO:
