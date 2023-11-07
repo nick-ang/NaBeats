@@ -27,7 +27,6 @@ const Nav = ({ libraryStatus, setLibraryStatus }) => {
 		<NavContainer>
 			<nav>
 				<a href="./#albums">Albums</a>
-				<a href="#">Contact</a>
 			</nav>
 			<H1 libraryStatus={libraryStatus}>NaBeats</H1>
 			<Button onClick={() => setLibraryStatus(!libraryStatus)}>
