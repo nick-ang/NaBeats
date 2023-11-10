@@ -15,7 +15,7 @@ deploy via netlify
 TODO:
 
 Add buy me a coffee
-Add downloads
+Add downloads to albums 
 Add socials
 Add sample packs
 Embed soundcloud
