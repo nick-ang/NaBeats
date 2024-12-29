@@ -21,27 +21,21 @@ const Player = ({
   const playSongHandler = () => {
     if (isPlaying) {
       audioRef.current.pause();
-      setIsPlaying(!isPlaying);
+      setIsPlaying(false);
     } else {
       audioRef.current.play();
-      setIsPlaying(!isPlaying);
+      setIsPlaying(true);
     }
   };
 
-  const togglePlayPauseIcon = () => {
-    if (isPlaying) {
-      return faPause;
-    } else {
-      return faPlay;
-    }
-  };
+  const togglePlayPauseIcon = () => (isPlaying ? faPause : faPlay);
 
   const getTime = (time) => {
     if (isNaN(time) || time === Infinity) {
-      return "00:00"; // Default value for invalid times
+      return "00:00";
     }
-    let minute = Math.floor(time / 60);
-    let second = ("0" + Math.floor(time % 60)).slice(-2);
+    const minute = Math.floor(time / 60);
+    const second = ("0" + Math.floor(time % 60)).slice(-2);
     return `${minute}:${second}`;
   };
 
@@ -57,47 +51,38 @@ const Player = ({
     if (direction === "skip-forward") {
       nextSong = songs[(currentIndex + 1) % songs.length];
     } else if (direction === "skip-back") {
-      nextSong = songs[(currentIndex - 1 + songs.length) % songs.length]; // Fix negative index logic
+      nextSong = songs[(currentIndex - 1 + songs.length) % songs.length];
     }
 
-    // Update the current song and reset song info
-    setCurrentSong(nextSong);
-    setSongInfo({
-      ...songInfo,
-      currentTime: 0,
-      duration: nextSong.duration || 0, // Ensure the duration is set
-    });
+    await setCurrentSong(nextSong);
 
     activeLibraryHandler(nextSong);
 
-    // Ensure the audio plays after the state is updated
-    setTimeout(() => {
-      if (isPlaying && audioRef.current) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error("Play failed:", error);
-          });
-        }
-      }
-    }, 100); // Wait a bit before playing the audio
+    if (audioRef.current) {
+      audioRef.current.src = nextSong.audio;
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
   };
 
   const activeLibraryHandler = (newSong) => {
-    const newSongs = songs.map((song) => {
-      if (song.id === newSong.id) {
-        return {
-          ...song,
-          active: true,
-        };
-      } else {
-        return {
-          ...song,
-          active: false,
-        };
-      }
-    });
+    const newSongs = songs.map((song) => ({
+      ...song,
+      active: song.id === newSong.id,
+    }));
     setSongs(newSongs);
+  };
+
+  const songEndHandler = () => {
+    skipTrackHandler("skip-forward");
+  };
+
+  const timeUpdateHandler = (e) => {
+    setSongInfo({
+      ...songInfo,
+      currentTime: e.target.currentTime,
+      duration: e.target.duration,
+    });
   };
 
   return (
@@ -107,90 +92,97 @@ const Player = ({
           onClick={() => skipTrackHandler("skip-back")}
           className="skip-back"
           icon={faAngleLeft}
-          size="0.9x" // Even smaller icon size for compactness
+          size="0.9x"
           style={pointer}
         />
         <FontAwesomeIcon
           onClick={playSongHandler}
           className="play"
           icon={togglePlayPauseIcon()}
-          size="1.1x" // Slightly smaller icon size for compactness
+          size="1.1x"
           style={pointer}
         />
         <FontAwesomeIcon
           onClick={() => skipTrackHandler("skip-forward")}
           className="skip-forward"
           icon={faAngleRight}
-          size="0.9x" // Even smaller icon size for compactness
+          size="0.9x"
           style={pointer}
         />
       </PlayControlContainer>
 
-      {/* Time control and track bar should be placed below play controls on mobile */}
       <TimeControlContainer>
         <P>{getTime(songInfo.currentTime || 0)}</P>
         <Track currentSong={currentSong}>
           <Input
             onChange={dragHandler}
             min={0}
-            max={songInfo.duration || 0} // Ensure max is a valid number
-            value={songInfo.currentTime || 0} // Ensure currentTime is valid
+            max={songInfo.duration || 0}
+            value={songInfo.currentTime || 0}
             type="range"
           />
           <AnimateTrack songInfo={songInfo}></AnimateTrack>
         </Track>
         <P>{getTime(songInfo.duration || 0)}</P>
       </TimeControlContainer>
+
+      <audio
+        ref={audioRef}
+        src={currentSong.audio}
+        onTimeUpdate={timeUpdateHandler}
+        onEnded={songEndHandler}
+        onLoadedMetadata={timeUpdateHandler}
+      />
     </PlayerContainer>
   );
 };
 
 const PlayerContainer = styled.div`
-  min-height: 4vh; /* Reduced height */
+  min-height: 4vh;
   justify-content: space-evenly;
   display: flex;
   flex-direction: row;
   flex: 0 0 75%;
   width: 100%;
   @media screen and (max-width: 768px) {
-    flex-direction: column; /* Stack elements vertically on mobile */
+    flex-direction: column;
     align-items: center;
-    padding: 4px; /* Reduced padding */
+    padding: 4px;
   }
 `;
 
 const TimeControlContainer = styled.div`
-  width: 35%; /* Further reduced width for time control */
+  width: 35%;
   display: flex;
   align-items: center;
   @media screen and (max-width: 768px) {
-    width: 75%; /* Make track container take up more space on mobile */
-    margin-top: 6px; /* Less space between controls and slider */
-    padding-bottom: 8px; /* Reduced bottom padding */
+    width: 75%;
+    margin-top: 6px;
+    padding-bottom: 8px;
   }
 `;
 
 const Track = styled.div`
   background: lightblue;
   width: 100%;
-  height: 0.6rem; /* Smaller track height */
+  height: 0.6rem;
   position: relative;
   border-radius: 1rem;
   overflow: hidden;
   background: linear-gradient(to right, ${(p) => p.currentSong.color[0]}, ${(p) => p.currentSong.color[1]});
   @media screen and (max-width: 768px) {
-    margin-bottom: 6px; /* Less space between the track and other elements */
+    margin-bottom: 6px;
   }
 `;
 
 const AnimateTrack = styled.div`
-  background: rgb(204, 204, 204);
-  width: 100%;
+  background: rgb(255, 0, 0);
+  width: ${(p) =>
+    Math.round((p.songInfo.currentTime * 100) / p.songInfo.duration) + "%"};
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  transform: translateX(${(p) => Math.round((p.songInfo.currentTime * 100) / p.songInfo.duration) + "%"});
   pointer-events: none;
 `;
 
@@ -203,9 +195,7 @@ const Input = styled.input`
     outline: none;
     -webkit-appearance: none;
   }
-  /* Ensure the slider is full-width and functional */
   @media screen and (max-width: 768px) {
-    /* Make slider thumb bigger on mobile */
     &::-webkit-slider-thumb {
       height: 18px;
       width: 18px;
@@ -213,29 +203,19 @@ const Input = styled.input`
   }
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 14px; /* Slightly larger thumb size for better interaction */
+    height: 14px;
     width: 14px;
-    background: transparent;
-    border: none;
-  }
-  &::-moz-range-thumb {
-    -webkit-appearance: none;
-    background: transparent;
-    border: none;
-  }
-  &::-ms-thumb {
-    -webkit-appearance: none;
     background: transparent;
     border: none;
   }
 `;
 
 const P = styled.p`
-  padding: 0 0.3rem 0 0.3rem; /* Smaller padding */
+  padding: 0 0.3rem 0 0.3rem;
   user-select: none;
-  font-size: 0.6rem; /* Smaller font size */
+  font-size: 0.6rem;
   @media screen and (max-width: 768px) {
-    font-size: 0.5rem; /* Further reduced font size on mobile */
+    font-size: 0.5rem;
   }
 `;
 
@@ -243,10 +223,10 @@ const PlayControlContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem; /* Reduced padding */
+  padding: 0.4rem;
   width: 30%;
   @media screen and (max-width: 768px) {
-    width: 70%; /* Slightly more compact control area on mobile */
+    width: 70%;
     justify-content: space-around;
   }
 `;
