@@ -60,9 +60,17 @@ const App = () => {
   return (
     <AppContainer libraryStatus={libraryStatus}>
       <div className="appContainer">
-        <div className="main">
-          <video src={videoBg} autoPlay loop muted />
-        </div>
+<div className="main">
+  <video 
+    src={videoBg} 
+    autoPlay 
+    loop 
+    muted 
+    playsInline 
+    // style={{ width: "100%", height: "auto" }}
+  />
+</div>
+
         <Nav libraryStatus={libraryStatus} setLibraryStatus={setLibraryStatus} />
         <Library
           songs={songs}
