@@ -49,21 +49,29 @@ const Player = ({
 
 	const skipTrackHandler = async (direction) => {
 		let currentIndex = songs.findIndex((song) => song.id === currentSong.id);
+		let nextSong;
+
 		if (direction === "skip-forward") {
-			await setCurrentSong(songs[(currentIndex + 1) % songs.length]);
-			activeLibraryHandler(songs[(currentIndex + 1) % songs.length]);
+			nextSong = songs[(currentIndex + 1) % songs.length];
 		} else if (direction === "skip-back") {
-			if ((currentIndex - 1) % songs.length === -1) {
-				await setCurrentSong(songs[songs.length - 1]);
-				activeLibraryHandler(songs[songs.length - 1]);
-			} else {
-				await setCurrentSong(songs[(currentIndex - 1) % songs.length]);
-				activeLibraryHandler(songs[(currentIndex - 1) % songs.length]);
+			nextSong = songs[(currentIndex - 1 + songs.length) % songs.length]; // Fix negative index logic
+		}
+
+		// Update the current song first
+		setCurrentSong(nextSong);
+		activeLibraryHandler(nextSong);
+
+		// Ensure the audio plays after the state is updated
+		setTimeout(() => {
+			if (isPlaying) {
+				const playPromise = audioRef.current.play();
+				if (playPromise !== undefined) {
+					playPromise.catch((error) => {
+						console.error("Error playing audio:", error);
+					});
+				}
 			}
-		}
-		if (isPlaying) {
-			audioRef.current.play();
-		}
+		}, 100); // Wait a bit before playing the audio
 	};
 
 	const activeLibraryHandler = (newSong) => {
@@ -90,21 +98,21 @@ const Player = ({
 					onClick={() => skipTrackHandler("skip-back")}
 					className="skip-back"
 					icon={faAngleLeft}
-					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					size="0.9x" // Even smaller icon size for compactness
 					style={pointer}
 				/>
 				<FontAwesomeIcon
 					onClick={playSongHandler}
 					className="play"
 					icon={togglePlayPauseIcon()}
-					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					size="1.1x" // Slightly smaller icon size for compactness
 					style={pointer}
 				/>
 				<FontAwesomeIcon
 					onClick={() => skipTrackHandler("skip-forward")}
 					className="skip-forward"
 					icon={faAngleRight}
-					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					size="0.9x" // Even smaller icon size for compactness
 					style={pointer}
 				/>
 			</PlayControlContainer>
@@ -129,7 +137,7 @@ const Player = ({
 };
 
 const PlayerContainer = styled.div`
-	min-height: 5vh;
+	min-height: 4vh; /* Reduced height */
 	justify-content: space-evenly;
 	display: flex;
 	flex-direction: row;
@@ -138,34 +146,33 @@ const PlayerContainer = styled.div`
 	@media screen and (max-width: 768px) {
 		flex-direction: column; /* Stack elements vertically on mobile */
 		align-items: center;
-		padding: 8px;
+		padding: 4px; /* Reduced padding */
 	}
 `;
 
 const TimeControlContainer = styled.div`
-	width: 50%;
+	width: 35%; /* Further reduced width for time control */
 	display: flex;
 	align-items: center;
 	@media screen and (max-width: 768px) {
-		width: 90%; /* Make track container take up most of the screen on mobile */
-		margin-top: 10px; /* Space between controls and slider */
-		padding-bottom: 15px; /* Add more padding to the bottom */
+		width: 75%; /* Make track container take up more space on mobile */
+		margin-top: 6px; /* Less space between controls and slider */
+		padding-bottom: 8px; /* Reduced bottom padding */
 	}
 `;
 
 const Track = styled.div`
 	background: lightblue;
 	width: 100%;
-	height: 1rem;
+	height: 0.6rem; /* Smaller track height */
 	position: relative;
 	border-radius: 1rem;
 	overflow: hidden;
 	background: linear-gradient(to right, ${(p) => p.currentSong.color[0]}, ${(p) => p.currentSong.color[1]});
 	@media screen and (max-width: 768px) {
-		margin-bottom: 10px; /* Space between the track and other elements */
+		margin-bottom: 6px; /* Less space between the track and other elements */
 	}
 `;
-
 
 const AnimateTrack = styled.div`
 	background: rgb(204, 204, 204);
@@ -187,18 +194,18 @@ const Input = styled.input`
 		outline: none;
 		-webkit-appearance: none;
 	}
-
+	/* Ensure the slider is full-width and functional */
 	@media screen and (max-width: 768px) {
 		/* Make slider thumb bigger on mobile */
 		&::-webkit-slider-thumb {
-			height: 24px;
-			width: 24px;
+			height: 18px;
+			width: 18px;
 		}
 	}
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		height: 12px;
-		width: 12px;
+		height: 14px; /* Slightly larger thumb size for better interaction */
+		width: 14px;
 		background: transparent;
 		border: none;
 	}
@@ -215,10 +222,11 @@ const Input = styled.input`
 `;
 
 const P = styled.p`
-	padding: 0 1rem 0 1rem;
+	padding: 0 0.3rem 0 0.3rem; /* Smaller padding */
 	user-select: none;
+	font-size: 0.6rem; /* Smaller font size */
 	@media screen and (max-width: 768px) {
-		font-size: 0.75rem; /* Reduce font size on mobile */
+		font-size: 0.5rem; /* Further reduced font size on mobile */
 	}
 `;
 
@@ -226,10 +234,10 @@ const PlayControlContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0.8rem;
+	padding: 0.4rem; /* Reduced padding */
 	width: 30%;
 	@media screen and (max-width: 768px) {
-		width: 80%; /* Make controls take more space on mobile */
+		width: 70%; /* Slightly more compact control area on mobile */
 		justify-content: space-around;
 	}
 `;
