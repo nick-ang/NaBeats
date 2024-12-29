@@ -33,26 +33,23 @@ const App = () => {
     setSongInfo({ ...songInfo, currentTime, duration });
   };
 
-  const songEndHandler = async () => {
+  const songEndHandler = () => {
     let currentIndex = songs.findIndex((song) => song.id === currentSong.id);
     let nextSong = songs[(currentIndex + 1) % songs.length];
-    await setCurrentSong(nextSong);
+    setCurrentSong(nextSong);
 
+    // Update the song's active state
     const newSongs = songs.map((song) => {
       if (song.id === nextSong.id) {
-        return {
-          ...song,
-          active: true,
-        };
+        return { ...song, active: true };
       } else {
-        return {
-          ...song,
-          active: false,
-        };
+        return { ...song, active: false };
       }
     });
     setSongs(newSongs);
 
+    // Reload the audio element with the new source and play
+    audioRef.current.load();  // Ensure the audio source is reloaded
     if (isPlaying) {
       audioRef.current.play();
     }
@@ -78,7 +75,8 @@ const App = () => {
         />
         <div className="container">
           <div className="card"></div>
-		  <AlbumList />          <audio
+          <AlbumList />
+          <audio
             onLoadedMetadata={updateTimeHandler}
             onTimeUpdate={updateTimeHandler}
             onEnded={songEndHandler}
