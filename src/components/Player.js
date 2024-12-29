@@ -23,7 +23,6 @@ const Player = ({
       audioRef.current.pause();
       setIsPlaying(!isPlaying);
     } else {
-      audioRef.current.muted = false; // Ensure it's unmuted
       audioRef.current.play();
       setIsPlaying(!isPlaying);
     }
@@ -38,6 +37,9 @@ const Player = ({
   };
 
   const getTime = (time) => {
+    if (isNaN(time) || time === Infinity) {
+      return "00:00"; // Default value for invalid times
+    }
     let minute = Math.floor(time / 60);
     let second = ("0" + Math.floor(time % 60)).slice(-2);
     return `${minute}:${second}`;
@@ -58,25 +60,27 @@ const Player = ({
       nextSong = songs[(currentIndex - 1 + songs.length) % songs.length]; // Fix negative index logic
     }
 
-    // Update the current song first
+    // Update the current song and reset song info
     setCurrentSong(nextSong);
+    setSongInfo({
+      ...songInfo,
+      currentTime: 0,
+      duration: nextSong.duration || 0, // Ensure the duration is set
+    });
+
     activeLibraryHandler(nextSong);
 
     // Ensure the audio plays after the state is updated
     setTimeout(() => {
       if (isPlaying && audioRef.current) {
-        console.log("Attempting to play:", audioRef.current.paused); // Debug log
-        if (audioRef.current.paused) {
-          // If the audio is paused, attempt to play it
-          const playPromise = audioRef.current.play();
-          if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-              console.error("Play failed:", error); // Catch any errors
-            });
-          }
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error("Play failed:", error);
+          });
         }
       }
-    }, 100); // Delay to allow state update to complete before trying to play
+    }, 100); // Wait a bit before playing the audio
   };
 
   const activeLibraryHandler = (newSong) => {
@@ -129,8 +133,8 @@ const Player = ({
           <Input
             onChange={dragHandler}
             min={0}
-            max={songInfo.duration || 0}
-            value={songInfo.currentTime}
+            max={songInfo.duration || 0} // Ensure max is a valid number
+            value={songInfo.currentTime || 0} // Ensure currentTime is valid
             type="range"
           />
           <AnimateTrack songInfo={songInfo}></AnimateTrack>
