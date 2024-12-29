@@ -85,6 +85,31 @@ const Player = ({
 
 	return (
 		<PlayerContainer>
+			<PlayControlContainer>
+				<FontAwesomeIcon
+					onClick={() => skipTrackHandler("skip-back")}
+					className="skip-back"
+					icon={faAngleLeft}
+					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					style={pointer}
+				/>
+				<FontAwesomeIcon
+					onClick={playSongHandler}
+					className="play"
+					icon={togglePlayPauseIcon()}
+					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					style={pointer}
+				/>
+				<FontAwesomeIcon
+					onClick={() => skipTrackHandler("skip-forward")}
+					className="skip-forward"
+					icon={faAngleRight}
+					size="1.5x" // Slightly smaller icon size for compactness on mobile
+					style={pointer}
+				/>
+			</PlayControlContainer>
+
+			{/* Time control and track bar should be placed below play controls on mobile */}
 			<TimeControlContainer>
 				<P>{getTime(songInfo.currentTime || 0)}</P>
 				<Track currentSong={currentSong}>
@@ -97,43 +122,24 @@ const Player = ({
 					/>
 					<AnimateTrack songInfo={songInfo}></AnimateTrack>
 				</Track>
-
 				<P>{getTime(songInfo.duration || 0)}</P>
 			</TimeControlContainer>
-
-			<PlayControlContainer>
-				<FontAwesomeIcon
-					onClick={() => skipTrackHandler("skip-back")}
-					className="skip-back"
-					icon={faAngleLeft}
-					size="1x"
-					style={pointer}
-				/>
-				<FontAwesomeIcon
-					onClick={playSongHandler}
-					className="play"
-					icon={togglePlayPauseIcon()}
-					size="1x"
-					style={pointer}
-				/>
-				<FontAwesomeIcon
-					onClick={() => skipTrackHandler("skip-forward")}
-					className="skip-forward"
-					icon={faAngleRight}
-					size="1x"
-					style={pointer}
-				/>
-			</PlayControlContainer>
 		</PlayerContainer>
 	);
 };
 
 const PlayerContainer = styled.div`
 	min-height: 5vh;
-    justify-content: space-evenly;
+	justify-content: space-evenly;
 	display: flex;
 	flex-direction: row;
 	flex: 0 0 75%;
+	width: 100%;
+	@media screen and (max-width: 768px) {
+		flex-direction: column; /* Stack elements vertically on mobile */
+		align-items: center;
+		padding: 8px;
+	}
 `;
 
 const TimeControlContainer = styled.div`
@@ -141,7 +147,9 @@ const TimeControlContainer = styled.div`
 	display: flex;
 	align-items: center;
 	@media screen and (max-width: 768px) {
-		width: 90%;
+		width: 90%; /* Make track container take up most of the screen on mobile */
+		margin-top: 10px; /* Space between controls and slider */
+		padding-bottom: 15px; /* Add more padding to the bottom */
 	}
 `;
 
@@ -153,7 +161,11 @@ const Track = styled.div`
 	border-radius: 1rem;
 	overflow: hidden;
 	background: linear-gradient(to right, ${(p) => p.currentSong.color[0]}, ${(p) => p.currentSong.color[1]});
+	@media screen and (max-width: 768px) {
+		margin-bottom: 10px; /* Space between the track and other elements */
+	}
 `;
+
 
 const AnimateTrack = styled.div`
 	background: rgb(204, 204, 204);
@@ -171,22 +183,22 @@ const Input = styled.input`
 	-webkit-appearance: none;
 	background: transparent;
 	cursor: pointer;
-	/* padding-top: 1rem;
-	padding-bottom: 1rem; */
 	&:focus {
 		outline: none;
 		-webkit-appearance: none;
 	}
+
 	@media screen and (max-width: 768px) {
+		/* Make slider thumb bigger on mobile */
 		&::-webkit-slider-thumb {
-			height: 48px;
-			width: 48px;
+			height: 24px;
+			width: 24px;
 		}
 	}
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		height: 16px;
-		width: 16px;
+		height: 12px;
+		width: 12px;
 		background: transparent;
 		border: none;
 	}
@@ -200,26 +212,25 @@ const Input = styled.input`
 		background: transparent;
 		border: none;
 	}
-	&::-moz-range-thumb {
-		-webkit-appearance: none;
-		background: transparent;
-		border: none;
-	}
 `;
 
 const P = styled.p`
 	padding: 0 1rem 0 1rem;
 	user-select: none;
+	@media screen and (max-width: 768px) {
+		font-size: 0.75rem; /* Reduce font size on mobile */
+	}
 `;
 
 const PlayControlContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 1rem;
+	padding: 0.8rem;
 	width: 30%;
 	@media screen and (max-width: 768px) {
-		width: 60%;
+		width: 80%; /* Make controls take more space on mobile */
+		justify-content: space-around;
 	}
 `;
 
