@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight, faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 
-// style
+// Style
 const pointer = { cursor: "pointer" };
 
 const Player = ({
@@ -84,6 +84,19 @@ const Player = ({
       duration: e.target.duration,
     });
   };
+
+  // Automatically play the song when the component mounts
+  useEffect(() => {
+    const playOnLoad = async () => {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.log("Auto-play failed:", error);
+      }
+    };
+    playOnLoad();
+  }, [audioRef, setIsPlaying]);
 
   return (
     <PlayerContainer>
