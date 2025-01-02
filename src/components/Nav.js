@@ -50,7 +50,7 @@ const Nav = ({ libraryStatus, setLibraryStatus }) => {
           </a>
 
           <a 
-            href="https://spotify.com/your-spotify-page" 
+            href="https://open.spotify.com/artist/5cdZiOOuN4jkZWgm8EBarq" 
             target="_blank" 
             rel="noopener noreferrer" 
             style={{ marginLeft: '15px' }}
