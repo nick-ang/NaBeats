@@ -41,7 +41,7 @@ const Nav = ({ libraryStatus, setLibraryStatus }) => {
           </a>
 
           <a 
-            href="https://itunes.apple.com/your-itunes-page" 
+            href="https://music.apple.com/us/artist/nabeats/1788017360" 
             target="_blank" 
             rel="noopener noreferrer" 
             style={{ marginLeft: '15px' }}
